@@ -26,13 +26,13 @@
     <None Update="Shaders\quadraticConcaveBorder.gsh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Shaders\quadraticConcave.fsh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Shaders\solidColor.fsh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Shaders\simpleTex.fsh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Shaders\quadraticConcave.fsh">
+    <None Update="Shaders\texColor.fsh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Shaders\quadraticConcave.gsh">

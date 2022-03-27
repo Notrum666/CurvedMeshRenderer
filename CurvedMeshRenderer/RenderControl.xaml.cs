@@ -82,14 +82,17 @@ namespace CurvedMeshRenderer
 
             dummyVAO = GL.GenVertexArray();
 
-            AssetsManager.LoadPipeline("QuadraticConcave", "Shaders\\quadraticConcave.vsh",
-                                                           "Shaders\\quadraticConcave.gsh",
-                                                           "Shaders\\quadraticConcave.fsh");
+            AssetsManager.LoadPipeline("QuadraticConcaveSolid", "Shaders\\quadraticConcave.vsh",
+                                                                "Shaders\\quadraticConcave.gsh",
+                                                                "Shaders\\solidColor.fsh");
+            AssetsManager.LoadPipeline("QuadraticConcaveSolution", "Shaders\\quadraticConcave.vsh",
+                                                                   "Shaders\\quadraticConcave.gsh",
+                                                                   "Shaders\\quadraticConcave.fsh");
             AssetsManager.LoadPipeline("QuadraticConcaveBorder", "Shaders\\quadraticConcave.vsh",
                                                                  "Shaders\\quadraticConcaveBorder.gsh",
                                                                  "Shaders\\solidColor.fsh");
             AssetsManager.LoadPipeline("FullscreenTex", "Shaders\\fullscreenQuad.vsh",
-                                                        "Shaders\\simpleTex.fsh");
+                                                        "Shaders\\texColor.fsh");
 
             AssetsManager.LoadMesh("TestMesh", "mesh.obj");
 
@@ -111,25 +114,36 @@ namespace CurvedMeshRenderer
             GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            Pipeline pipeline = AssetsManager.Pipelines["QuadraticConcave"];
+            Pipeline pipeline = AssetsManager.Pipelines["QuadraticConcaveSolid"];
             pipeline.Use();
             pipeline.UniformMatrix3x3("view", (Matrix3x3f)Camera.View);
+            pipeline.Uniform4("color", 0.0f, 0.0f, 0.0f, 1.0f);
             GL.BindVertexArray(mesh.VAO);
 
             GL.Enable(EnableCap.StencilTest);
-
             GL.Clear(ClearBufferMask.StencilBufferBit);
             GL.StencilFunc(StencilFunction.Always, 0, 1);
             GL.StencilOp(StencilOp.Invert, StencilOp.Invert, StencilOp.Invert);
             GL.ColorMask(false, false, false, false);
-            
+
             GL.DrawElements(PrimitiveType.TrianglesAdjacency, 6 * mesh.Polygons.Count, DrawElementsType.UnsignedInt, 0);
-            
+
+            pipeline = AssetsManager.Pipelines["QuadraticConcaveSolution"];
+            pipeline.Use();
+            pipeline.UniformMatrix3x3("view", (Matrix3x3f)Camera.View);
+            pipeline.Uniform1("minValue", -1.41f);
+            pipeline.Uniform1("maxValue", 1.41f);
+            pipeline.Uniform4("minColor", 0.0f, 0.0f, 1.0f, 1.0f);
+            pipeline.Uniform4("maxColor", 1.0f, 0.0f, 0.0f, 1.0f);
+
             GL.StencilFunc(StencilFunction.Equal, 1, 1);
             GL.StencilOp(StencilOp.Keep, StencilOp.Keep, StencilOp.Keep);
             GL.ColorMask(true, true, true, true);
 
-            GL.DrawElements(PrimitiveType.TrianglesAdjacency, 6 * mesh.Polygons.Count, DrawElementsType.UnsignedInt, 0);
+            for (int i = 0; i < mesh.Polygons.Count; i++)
+            { 
+                GL.DrawElements(PrimitiveType.TrianglesAdjacency, 6, DrawElementsType.UnsignedInt, i * 6 * 4);
+            }
 
             GL.Disable(EnableCap.StencilTest);
 
